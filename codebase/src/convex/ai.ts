@@ -48,12 +48,7 @@ export const generateIepGoal = action({
 
       // Simulate token-by-token loading of the SMART goal
       const simulatedGoal = await simulateLoading(tokens);
-      const formattedGoal = `
-        <h3>IEP Goal: Reading Fluency and Decoding Multisyllabic Words</h3>
-        <p><strong>Student:</strong> [Student's Name]</p>
-        <p><strong>Area of Need:</strong> Reading Fluency and Decoding</p>
-        <p><strong>Goal:</strong> ${simulatedGoal}</p>
-      `;
+      const formattedGoal = `${simulatedGoal}`;
 
       console.log(simulatedGoal);
 
