@@ -14,6 +14,7 @@ import { useRouter, useParams } from "next/navigation"
 import { motion } from "framer-motion"
 import { format } from "date-fns"
 import { Id } from "@/convex/_generated/dataModel"
+import { useAi } from "@/hooks/use-ai"
 
 export function formatDate(dateString: string): string {
   try {
@@ -99,6 +100,17 @@ export default function StudentDetailsPage() {
     ] 
   }
   
+  // Chatbot
+  const { draftId } = useParams(); // if you still need this for future use
+  const { generateIepGoal } = useAi();
+  const [goal, setGoal] = useState<string>("");
+
+  async function handleGenerateGoal() {
+    const plafp = "Student struggles with reading fluency and decoding multi-syllabic words.";
+    const smartGoal = await generateIepGoal({ plafp });
+    setGoal(smartGoal);
+  }
+
   // Loading state
   if (studentDetails === undefined) {
     return (
@@ -227,6 +239,7 @@ export default function StudentDetailsPage() {
               <TabsTrigger value="attendance">Attendance</TabsTrigger>
               <TabsTrigger value="mtss">MTSS</TabsTrigger>
               <TabsTrigger value="evaluations">Evaluations</TabsTrigger>
+              <TabsTrigger value="iep">Individual Evaluation Plan</TabsTrigger>
             </TabsList>
             
             {/* Overview Tab */}
@@ -601,354 +614,373 @@ export default function StudentDetailsPage() {
               </Card>
             </TabsContent>
             {/* Evaluations Tab */}
-<TabsContent value="evaluations">
-  {/* Evaluation Summary Card */}
-  <Card>
-    <CardHeader>
-      <CardTitle>Evaluation Summary</CardTitle>
-      <CardDescription>
-        Comprehensive evaluation results and eligibility determination
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div className="flex items-center gap-2">
-        <Badge variant="outline" className="text-sm bg-blue-100 border-blue-300">
-          Specific Learning Disability
-        </Badge>
-        <span className="text-sm text-muted-foreground">
-          Evaluation Date: {formatDate(evaluationsData.psychologicalEvaluation.dateOfEvaluation)}
-        </span>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium mb-1">Evaluation Team</h4>
-        <div className="flex flex-wrap gap-2">
-          {evaluationsData.evaluationTeam.map((member, index) => (
-            <Badge key={index} variant="secondary" className="text-xs">
-              {member.name} - {member.role}
-            </Badge>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium mb-1">Summary of Findings</h4>
-        <p className="text-sm text-muted-foreground">
-          {evaluationsData.evaluationSummary}
-        </p>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium mb-1">Eligibility Recommendation</h4>
-        <div className="flex items-start gap-2">
-          <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
-          <p className="text-sm text-muted-foreground">
-            {evaluationsData.recommendationForEligibility}
-          </p>
-        </div>
-      </div>
-    </CardContent>
-  </Card>
-  
-  {/* Psychological Evaluation */}
-  <Card className="mt-6">
-    <CardHeader>
-      <CardTitle>Psychological Evaluation</CardTitle>
-      <CardDescription>
-        Conducted on {formatDate(evaluationsData.psychologicalEvaluation.dateOfEvaluation)}
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-6">
-      {/* Administered Tests */}
-      <div>
-        <h4 className="text-sm font-medium mb-3">Administered Tests</h4>
-        <div className="space-y-4">
-          {evaluationsData.psychologicalEvaluation.administeredTests.map((test, index) => (
-            <div key={index} className="border rounded-lg p-4">
-              <h5 className="font-medium mb-2">{test.testName}</h5>
-              <div className="flex flex-wrap gap-2">
-                {test.subtestsAdministered ? (
-                  test.subtestsAdministered.map((subtest, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs">
-                      {subtest}
+            <TabsContent value="evaluations">
+              {/* Evaluation Summary Card */}
+              <Card>
+                <CardHeader>
+                  <CardTitle>Evaluation Summary</CardTitle>
+                  <CardDescription>
+                    Comprehensive evaluation results and eligibility determination
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div className="flex items-center gap-2">
+                    <Badge variant="outline" className="text-sm bg-blue-100 border-blue-300">
+                      Specific Learning Disability
                     </Badge>
-                  ))
-                ) : (
-                  test.clustersAdministered?.map((cluster, idx) => (
-                    <Badge key={idx} variant="outline" className="text-xs">
-                      {cluster}
-                    </Badge>
-                  ))
-                )}
-              </div>
-            </div>
-          ))}
-        </div>
-      </div>
-      
-      {/* Cognitive Assessment */}
-      <div>
-        <h4 className="text-sm font-medium mb-3">Cognitive Assessment Results</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Full Scale IQ</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fsIq}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fsIq} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Verbal Comprehension</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.verbalComprehensionIndex}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.verbalComprehensionIndex} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Visual Spatial</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.visualSpatialIndex}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.visualSpatialIndex} 
-                className="h-2" 
-              />
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Fluid Reasoning</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fluidReasoningIndex}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fluidReasoningIndex} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Working Memory</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.workingMemoryIndex}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.workingMemoryIndex} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Processing Speed</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.processingSpeedIndex}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.processingSpeedIndex} 
-                className="h-2" 
-              />
-            </div>
-          </div>
-        </div>
-        <div className="mt-4">
-          <p className="text-sm text-muted-foreground">
-            {evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.narrativeSummary}
-          </p>
-        </div>
-      </div>
-      
-      {/* Achievement Assessment */}
-      <div>
-        <h4 className="text-sm font-medium mb-3">Achievement Assessment Results</h4>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Basic Reading Skills</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.basicReadingSkills}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.basicReadingSkills} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Reading Comprehension</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.readingComprehension}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.readingComprehension} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Math Calculation</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathCalculationSkills}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathCalculationSkills} 
-                className="h-2" 
-              />
-            </div>
-          </div>
-          <div className="space-y-3">
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Math Problem Solving</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathProblemSolving}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathProblemSolving} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Written Expression</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.writtenExpression}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.writtenExpression} 
-                className="h-2" 
-              />
-            </div>
-            <div>
-              <div className="flex justify-between text-sm mb-1">
-                <span>Oral Language</span>
-                <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.oralLanguage}</span>
-              </div>
-              <Progress 
-                value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.oralLanguage} 
-                className="h-2" 
-              />
-            </div>
-          </div>
-        </div>
-        <div className="mt-4">
-          <p className="text-sm text-muted-foreground">
-            {evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.narrativeSummary}
-          </p>
-        </div>
-      </div>
-      
-      {/* Behavioral Observations */}
-      <div>
-        <h4 className="text-sm font-medium mb-2">Behavioral Observations</h4>
-        <p className="text-sm text-muted-foreground">
-          {evaluationsData.psychologicalEvaluation.behavioralObservations}
-        </p>
-      </div>
-    </CardContent>
-  </Card>
-  
-  {/* Speech-Language Evaluation */}
-  <Card className="mt-6">
-    <CardHeader>
-      <CardTitle>Speech-Language Evaluation</CardTitle>
-      <CardDescription>
-        Conducted on {formatDate(evaluationsData.speechLanguageEvaluation.dateOfEvaluation)}
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div>
-        <h4 className="text-sm font-medium mb-2">Areas Assessed</h4>
-        <div className="flex flex-wrap gap-2">
-          {evaluationsData.speechLanguageEvaluation.areasAssessed.map((area, index) => (
-            <Badge key={index} variant="outline" className="text-xs">
-              {area}
-            </Badge>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium mb-2">Findings Summary</h4>
-        <div className="space-y-3">
-          <div className="border rounded-lg p-3">
-            <h5 className="text-sm font-medium mb-1">Phonological Awareness</h5>
-            <p className="text-sm text-muted-foreground">
-              {evaluationsData.speechLanguageEvaluation.findingsSummary.phonologicalAwareness}
-            </p>
-          </div>
-          <div className="border rounded-lg p-3">
-            <h5 className="text-sm font-medium mb-1">Phonics Skills</h5>
-            <p className="text-sm text-muted-foreground">
-              {evaluationsData.speechLanguageEvaluation.findingsSummary.phonicsSkills}
-            </p>
-          </div>
-          <div className="border rounded-lg p-3">
-            <h5 className="text-sm font-medium mb-1">Oral Language Comprehension</h5>
-            <p className="text-sm text-muted-foreground">
-              {evaluationsData.speechLanguageEvaluation.findingsSummary.oralLanguageComprehension}
-            </p>
-          </div>
-          <div className="border rounded-lg p-3">
-            <h5 className="text-sm font-medium mb-1">Expressive Language</h5>
-            <p className="text-sm text-muted-foreground">
-              {evaluationsData.speechLanguageEvaluation.findingsSummary.expressiveLanguage}
-            </p>
-          </div>
-          <div className="border rounded-lg p-3">
-            <h5 className="text-sm font-medium mb-1">Articulation</h5>
-            <p className="text-sm text-muted-foreground">
-              {evaluationsData.speechLanguageEvaluation.findingsSummary.articulation}
-            </p>
-          </div>
-        </div>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium mb-2">Recommendations</h4>
-        <p className="text-sm text-muted-foreground">
-          {evaluationsData.speechLanguageEvaluation.recommendations}
-        </p>
-      </div>
-    </CardContent>
-  </Card>
-  
-  {/* Occupational Therapy Consult */}
-  <Card className="mt-6">
-    <CardHeader>
-      <CardTitle>Occupational Therapy Consult</CardTitle>
-      <CardDescription>
-        Conducted on {formatDate(evaluationsData.occupationalTherapyConsult.dateOfConsultation)}
-      </CardDescription>
-    </CardHeader>
-    <CardContent className="space-y-4">
-      <div>
-        <h4 className="text-sm font-medium mb-2">Areas Observed</h4>
-        <div className="flex flex-wrap gap-2">
-          {evaluationsData.occupationalTherapyConsult.areasObserved.map((area, index) => (
-            <Badge key={index} variant="outline" className="text-xs">
-              {area}
-            </Badge>
-          ))}
-        </div>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium mb-2">Findings Summary</h4>
-        <p className="text-sm text-muted-foreground">
-          {evaluationsData.occupationalTherapyConsult.findingsSummary}
-        </p>
-      </div>
-      
-      <div>
-        <h4 className="text-sm font-medium mb-2">Recommendations</h4>
-        <p className="text-sm text-muted-foreground">
-          {evaluationsData.occupationalTherapyConsult.recommendations}
-        </p>
-      </div>
-    </CardContent>
-  </Card>
-</TabsContent>
+                    <span className="text-sm text-muted-foreground">
+                      Evaluation Date: {formatDate(evaluationsData.psychologicalEvaluation.dateOfEvaluation)}
+                    </span>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-1">Evaluation Team</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {evaluationsData.evaluationTeam.map((member, index) => (
+                        <Badge key={index} variant="secondary" className="text-xs">
+                          {member.name} - {member.role}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-1">Summary of Findings</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {evaluationsData.evaluationSummary}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-1">Eligibility Recommendation</h4>
+                    <div className="flex items-start gap-2">
+                      <CheckCircle className="h-5 w-5 text-green-500 mt-0.5 flex-shrink-0" />
+                      <p className="text-sm text-muted-foreground">
+                        {evaluationsData.recommendationForEligibility}
+                      </p>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Psychological Evaluation */}
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Psychological Evaluation</CardTitle>
+                  <CardDescription>
+                    Conducted on {formatDate(evaluationsData.psychologicalEvaluation.dateOfEvaluation)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-6">
+                  {/* Administered Tests */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-3">Administered Tests</h4>
+                    <div className="space-y-4">
+                      {evaluationsData.psychologicalEvaluation.administeredTests.map((test, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <h5 className="font-medium mb-2">{test.testName}</h5>
+                          <div className="flex flex-wrap gap-2">
+                            {test.subtestsAdministered ? (
+                              test.subtestsAdministered.map((subtest, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">
+                                  {subtest}
+                                </Badge>
+                              ))
+                            ) : (
+                              test.clustersAdministered?.map((cluster, idx) => (
+                                <Badge key={idx} variant="outline" className="text-xs">
+                                  {cluster}
+                                </Badge>
+                              ))
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  {/* Cognitive Assessment */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-3">Cognitive Assessment Results</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Full Scale IQ</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fsIq}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fsIq} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Verbal Comprehension</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.verbalComprehensionIndex}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.verbalComprehensionIndex} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Visual Spatial</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.visualSpatialIndex}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.visualSpatialIndex} 
+                            className="h-2" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Fluid Reasoning</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fluidReasoningIndex}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.fluidReasoningIndex} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Working Memory</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.workingMemoryIndex}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.workingMemoryIndex} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Processing Speed</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.processingSpeedIndex}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.processingSpeedIndex} 
+                            className="h-2" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        {evaluationsData.psychologicalEvaluation.cognitiveAssessmentSummary.narrativeSummary}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Achievement Assessment */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-3">Achievement Assessment Results</h4>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Basic Reading Skills</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.basicReadingSkills}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.basicReadingSkills} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Reading Comprehension</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.readingComprehension}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.readingComprehension} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Math Calculation</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathCalculationSkills}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathCalculationSkills} 
+                            className="h-2" 
+                          />
+                        </div>
+                      </div>
+                      <div className="space-y-3">
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Math Problem Solving</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathProblemSolving}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.mathProblemSolving} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Written Expression</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.writtenExpression}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.writtenExpression} 
+                            className="h-2" 
+                          />
+                        </div>
+                        <div>
+                          <div className="flex justify-between text-sm mb-1">
+                            <span>Oral Language</span>
+                            <span className="font-medium">{evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.oralLanguage}</span>
+                          </div>
+                          <Progress 
+                            value={evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.oralLanguage} 
+                            className="h-2" 
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="mt-4">
+                      <p className="text-sm text-muted-foreground">
+                        {evaluationsData.psychologicalEvaluation.achievementAssessmentSummary.narrativeSummary}
+                      </p>
+                    </div>
+                  </div>
+                  
+                  {/* Behavioral Observations */}
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Behavioral Observations</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {evaluationsData.psychologicalEvaluation.behavioralObservations}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Speech-Language Evaluation */}
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Speech-Language Evaluation</CardTitle>
+                  <CardDescription>
+                    Conducted on {formatDate(evaluationsData.speechLanguageEvaluation.dateOfEvaluation)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Areas Assessed</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {evaluationsData.speechLanguageEvaluation.areasAssessed.map((area, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {area}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Findings Summary</h4>
+                    <div className="space-y-3">
+                      <div className="border rounded-lg p-3">
+                        <h5 className="text-sm font-medium mb-1">Phonological Awareness</h5>
+                        <p className="text-sm text-muted-foreground">
+                          {evaluationsData.speechLanguageEvaluation.findingsSummary.phonologicalAwareness}
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h5 className="text-sm font-medium mb-1">Phonics Skills</h5>
+                        <p className="text-sm text-muted-foreground">
+                          {evaluationsData.speechLanguageEvaluation.findingsSummary.phonicsSkills}
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h5 className="text-sm font-medium mb-1">Oral Language Comprehension</h5>
+                        <p className="text-sm text-muted-foreground">
+                          {evaluationsData.speechLanguageEvaluation.findingsSummary.oralLanguageComprehension}
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h5 className="text-sm font-medium mb-1">Expressive Language</h5>
+                        <p className="text-sm text-muted-foreground">
+                          {evaluationsData.speechLanguageEvaluation.findingsSummary.expressiveLanguage}
+                        </p>
+                      </div>
+                      <div className="border rounded-lg p-3">
+                        <h5 className="text-sm font-medium mb-1">Articulation</h5>
+                        <p className="text-sm text-muted-foreground">
+                          {evaluationsData.speechLanguageEvaluation.findingsSummary.articulation}
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Recommendations</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {evaluationsData.speechLanguageEvaluation.recommendations}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+              
+              {/* Occupational Therapy Consult */}
+              <Card className="mt-6">
+                <CardHeader>
+                  <CardTitle>Occupational Therapy Consult</CardTitle>
+                  <CardDescription>
+                    Conducted on {formatDate(evaluationsData.occupationalTherapyConsult.dateOfConsultation)}
+                  </CardDescription>
+                </CardHeader>
+                <CardContent className="space-y-4">
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Areas Observed</h4>
+                    <div className="flex flex-wrap gap-2">
+                      {evaluationsData.occupationalTherapyConsult.areasObserved.map((area, index) => (
+                        <Badge key={index} variant="outline" className="text-xs">
+                          {area}
+                        </Badge>
+                      ))}
+                    </div>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Findings Summary</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {evaluationsData.occupationalTherapyConsult.findingsSummary}
+                    </p>
+                  </div>
+                  
+                  <div>
+                    <h4 className="text-sm font-medium mb-2">Recommendations</h4>
+                    <p className="text-sm text-muted-foreground">
+                      {evaluationsData.occupationalTherapyConsult.recommendations}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            </TabsContent>
+
+            {/* IEP Tab */}
+            <TabsContent value="iep">
+              <Card>
+                <CardHeader>
+                  <CardTitle>IEP Draft - Auto Goal Generator</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <Button onClick={handleGenerateGoal}>Generate SMART Goal</Button>
+
+                  {goal && (
+                    <div className="mt-6 p-4 bg-muted rounded-md">
+                      <h4 className="text-lg font-medium mb-2">Generated SMART Goal:</h4>
+                      <p className="text-muted-foreground">{goal}</p>
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </TabsContent>
           </Tabs>
         </div>
       </div>
