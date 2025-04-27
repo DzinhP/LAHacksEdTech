@@ -148,13 +148,7 @@ export default function StudentDetailsPage() {
       .substring(0, 2)
   }
   
-  const formatDate = (dateString: string): string => {
-    try {
-      return format(new Date(dateString), 'MMM d, yyyy');
-    } catch (e) {
-      return dateString;
-    }
-  };
+  
   
   return (
     <div className="container">
@@ -227,11 +221,12 @@ export default function StudentDetailsPage() {
         {/* Main Content */}
         <div className="lg:col-span-3">
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="mb-6">
+          <TabsList className="mb-6">
               <TabsTrigger value="overview">Overview</TabsTrigger>
               <TabsTrigger value="grades">Grades</TabsTrigger>
               <TabsTrigger value="attendance">Attendance</TabsTrigger>
               <TabsTrigger value="mtss">MTSS</TabsTrigger>
+              <TabsTrigger value="evaluations">Evaluations</TabsTrigger>
             </TabsList>
             
             {/* Overview Tab */}
@@ -605,76 +600,7 @@ export default function StudentDetailsPage() {
                 </CardContent>
               </Card>
             </TabsContent>
-          </Tabs>
-        </div>
-      </div>
-    </div>
-  )
-}
-
-// Evaluations data (hardcoded)
-const evaluationsData = { 
-  studentIdentification: { 
-    studentId: "1357911", 
-    firstName: "Caleb", 
-    lastName: "Rodriguez", 
-    dob: "2018-08-03", 
-    grade: 2 
-  }, 
-  evaluationTeam: [ 
-    { name: "Dr. Anya Petrova", role: "School Psychologist" }, 
-    { name: "Sarah Chen", role: "Speech-Language Pathologist" }, 
-    { name: "Maria Garcia", role: "Occupational Therapist (Consult)" } 
-  ], 
-  psychologicalEvaluation: { 
-    dateOfEvaluation: "2025-05-15", 
-    administeredTests: [ 
-      { testName: "Wechsler Intelligence Scale for Children - Fifth Edition (WISC-V)", subtestsAdministered: ["Full Scale IQ", "Verbal Comprehension Index", "Visual Spatial Index", "Fluid Reasoning Index", "Working Memory Index", "Processing Speed Index"] }, 
-      { testName: "Woodcock-Johnson IV Tests of Achievement", clustersAdministered: ["Basic Reading Skills", "Reading Comprehension", "Math Calculation Skills", "Math Problem Solving", "Written Expression", "Oral Language"] } 
-    ], 
-    cognitiveAssessmentSummary: { 
-      fsIq: 82, 
-      verbalComprehensionIndex: 85, 
-      visualSpatialIndex: 90, 
-      fluidReasoningIndex: 79, 
-      workingMemoryIndex: 88, 
-      processingSpeedIndex: 83, 
-      narrativeSummary: "Caleb's Full Scale IQ falls within the low average range. His relative weaknesses were noted in Fluid Reasoning and Processing Speed. Strengths were observed in his Visual Spatial abilities. His Verbal Comprehension and Working Memory skills were in the average range." 
-    }, 
-    achievementAssessmentSummary: { 
-      basicReadingSkills: 75, 
-      readingComprehension: 78, 
-      mathCalculationSkills: 88, 
-      mathProblemSolving: 85, 
-      writtenExpression: 80, 
-      oralLanguage: 92, 
-      narrativeSummary: "Caleb demonstrated significant weaknesses in Basic Reading Skills and Reading Comprehension, falling in the low range. His Math Calculation and Problem Solving skills were in the average range, as was Written Expression. Oral Language skills were a relative strength, within the average range." 
-    }, 
-    behavioralObservations: "Caleb was cooperative during testing but exhibited some frustration during tasks requiring phonological manipulation and rapid naming. He required occasional redirection to maintain focus on timed tasks." 
-  }, 
-  speechLanguageEvaluation: { 
-    dateOfEvaluation: "2025-05-10", 
-    areasAssessed: ["Phonological Awareness", "Phonics Skills", "Oral Language Comprehension", "Expressive Language", "Articulation"], 
-    findingsSummary: { 
-      phonologicalAwareness: "Demonstrates significant deficits in phoneme segmentation, blending, and manipulation skills, scoring significantly below age expectations.", 
-      phonicsSkills: "Struggles with letter-sound correspondence and decoding single and multi-syllabic words. Relies heavily on guessing.", 
-      oralLanguageComprehension: "Age-appropriate receptive vocabulary and understanding of basic sentence structures.", 
-      expressiveLanguage: "Generally age-appropriate expressive vocabulary and sentence formation, but some difficulty with complex sentence structures when describing events.", 
-      articulation: "All phonemes were produced within normal limits." 
-    }, 
-    recommendations: "Continued speech-language support focusing on explicit and systematic instruction in phonological awareness and phonics skills is recommended to improve Caleb's foundational reading abilities." 
-  }, 
-  occupationalTherapyConsult: { 
-    dateOfConsultation: "2025-05-08", 
-    areasObserved: ["Fine Motor Skills", "Gross Motor Skills", "Sensory Processing"], 
-    findingsSummary: "No significant concerns noted in fine or gross motor skills. Teacher report indicates occasional difficulties with organization of written work, but direct observation did not reveal significant fine motor deficits. No significant sensory processing concerns reported or observed.", 
-    recommendations: "No direct occupational therapy services recommended at this time. Strategies for visual organization of written work may be beneficial." 
-  }, 
-  evaluationSummary: "Based on the comprehensive evaluations, Caleb presents with significant deficits in basic reading skills and phonological awareness, impacting his reading fluency and comprehension. Cognitive testing reveals a relative weakness in fluid reasoning and processing speed. These findings are consistent with a Specific Learning Disability in Reading (Dyslexia).", 
-  recommendationForEligibility: "Based on the evaluation data, Caleb meets the criteria for a Specific Learning Disability under federal and state guidelines. An IEP is recommended to provide specialized instruction and related services to address his identified needs." 
-}
-
-{/* Evaluations Tab */}
+            {/* Evaluations Tab */}
 <TabsContent value="evaluations">
   {/* Evaluation Summary Card */}
   <Card>
@@ -1023,3 +949,73 @@ const evaluationsData = {
     </CardContent>
   </Card>
 </TabsContent>
+          </Tabs>
+        </div>
+      </div>
+    </div>
+    
+  )
+  
+}
+// Evaluations data (hardcoded)
+const evaluationsData = { 
+  studentIdentification: { 
+    studentId: "1357911", 
+    firstName: "Caleb", 
+    lastName: "Rodriguez", 
+    dob: "2018-08-03", 
+    grade: 2 
+  }, 
+  evaluationTeam: [ 
+    { name: "Dr. Anya Petrova", role: "School Psychologist" }, 
+    { name: "Sarah Chen", role: "Speech-Language Pathologist" }, 
+    { name: "Maria Garcia", role: "Occupational Therapist (Consult)" } 
+  ], 
+  psychologicalEvaluation: { 
+    dateOfEvaluation: "2025-05-15", 
+    administeredTests: [ 
+      { testName: "Wechsler Intelligence Scale for Children - Fifth Edition (WISC-V)", subtestsAdministered: ["Full Scale IQ", "Verbal Comprehension Index", "Visual Spatial Index", "Fluid Reasoning Index", "Working Memory Index", "Processing Speed Index"] }, 
+      { testName: "Woodcock-Johnson IV Tests of Achievement", clustersAdministered: ["Basic Reading Skills", "Reading Comprehension", "Math Calculation Skills", "Math Problem Solving", "Written Expression", "Oral Language"] } 
+    ], 
+    cognitiveAssessmentSummary: { 
+      fsIq: 82, 
+      verbalComprehensionIndex: 85, 
+      visualSpatialIndex: 90, 
+      fluidReasoningIndex: 79, 
+      workingMemoryIndex: 88, 
+      processingSpeedIndex: 83, 
+      narrativeSummary: "Caleb's Full Scale IQ falls within the low average range. His relative weaknesses were noted in Fluid Reasoning and Processing Speed. Strengths were observed in his Visual Spatial abilities. His Verbal Comprehension and Working Memory skills were in the average range." 
+    }, 
+    achievementAssessmentSummary: { 
+      basicReadingSkills: 75, 
+      readingComprehension: 78, 
+      mathCalculationSkills: 88, 
+      mathProblemSolving: 85, 
+      writtenExpression: 80, 
+      oralLanguage: 92, 
+      narrativeSummary: "Caleb demonstrated significant weaknesses in Basic Reading Skills and Reading Comprehension, falling in the low range. His Math Calculation and Problem Solving skills were in the average range, as was Written Expression. Oral Language skills were a relative strength, within the average range." 
+    }, 
+    behavioralObservations: "Caleb was cooperative during testing but exhibited some frustration during tasks requiring phonological manipulation and rapid naming. He required occasional redirection to maintain focus on timed tasks." 
+  }, 
+  speechLanguageEvaluation: { 
+    dateOfEvaluation: "2025-05-10", 
+    areasAssessed: ["Phonological Awareness", "Phonics Skills", "Oral Language Comprehension", "Expressive Language", "Articulation"], 
+    findingsSummary: { 
+      phonologicalAwareness: "Demonstrates significant deficits in phoneme segmentation, blending, and manipulation skills, scoring significantly below age expectations.", 
+      phonicsSkills: "Struggles with letter-sound correspondence and decoding single and multi-syllabic words. Relies heavily on guessing.", 
+      oralLanguageComprehension: "Age-appropriate receptive vocabulary and understanding of basic sentence structures.", 
+      expressiveLanguage: "Generally age-appropriate expressive vocabulary and sentence formation, but some difficulty with complex sentence structures when describing events.", 
+      articulation: "All phonemes were produced within normal limits." 
+    }, 
+    recommendations: "Continued speech-language support focusing on explicit and systematic instruction in phonological awareness and phonics skills is recommended to improve Caleb's foundational reading abilities." 
+  }, 
+  occupationalTherapyConsult: { 
+    dateOfConsultation: "2025-05-08", 
+    areasObserved: ["Fine Motor Skills", "Gross Motor Skills", "Sensory Processing"], 
+    findingsSummary: "No significant concerns noted in fine or gross motor skills. Teacher report indicates occasional difficulties with organization of written work, but direct observation did not reveal significant fine motor deficits. No significant sensory processing concerns reported or observed.", 
+    recommendations: "No direct occupational therapy services recommended at this time. Strategies for visual organization of written work may be beneficial." 
+  }, 
+  evaluationSummary: "Based on the comprehensive evaluations, Caleb presents with significant deficits in basic reading skills and phonological awareness, impacting his reading fluency and comprehension. Cognitive testing reveals a relative weakness in fluid reasoning and processing speed. These findings are consistent with a Specific Learning Disability in Reading (Dyslexia).", 
+  recommendationForEligibility: "Based on the evaluation data, Caleb meets the criteria for a Specific Learning Disability under federal and state guidelines. An IEP is recommended to provide specialized instruction and related services to address his identified needs." 
+}
+
