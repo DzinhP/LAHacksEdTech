@@ -2,36 +2,35 @@ import { authTables } from "@convex-dev/auth/server";
 import { defineSchema, defineTable } from "convex/server";
 import { Infer, v } from "convex/values";
 
-// default user roles. can add / remove based on the project as needed
+// Default user roles
 export const ROLES = {
   ADMIN: "admin",
   USER: "user",
-  MEMBER: "member"
+  MEMBER: "member",
 } as const;
 
 export const roleValidator = v.union(
   v.literal(ROLES.ADMIN),
   v.literal(ROLES.USER),
   v.literal(ROLES.MEMBER),
-)
+);
 export type Role = Infer<typeof roleValidator>;
 
+// Define the schema
 const schema = defineSchema({
-  // default auth tables using convex auth.
-  ...authTables, // do not remove or modify
+  ...authTables, // DO NOT remove auth tables
 
-  // the users table is the default users table that is brought in by the authTables
+  // Users Table
   users: defineTable({
-    name: v.optional(v.string()), // name of the user. do not remove
-    image: v.optional(v.string()), // image of the user. do not remove
-    email: v.optional(v.string()), // email of the user. do not remove
-    emailVerificationTime: v.optional(v.number()), // email verification time. do not remove
-    isAnonymous: v.optional(v.boolean()), // is the user anonymous. do not remove
-    
-    role: v.optional(roleValidator), // role of the user. do not remove
-  })
-    .index("email", ["email"]), // Added comma here
+    name: v.optional(v.string()),
+    image: v.optional(v.string()),
+    email: v.optional(v.string()),
+    emailVerificationTime: v.optional(v.number()),
+    isAnonymous: v.optional(v.boolean()),
+    role: v.optional(roleValidator),
+  }).index("email", ["email"]),
 
+  // Courses Table
   courses: defineTable({
     name: v.string(),
     description: v.string(),
@@ -41,14 +40,15 @@ const schema = defineSchema({
     .index("by_teacher", ["teacherId"])
     .index("by_student", ["students"]),
 
+  // Assignments Table
   assignments: defineTable({
     title: v.string(),
     description: v.string(),
     dueDate: v.number(),
     courseId: v.id("courses"),
-  })
-    .index("by_course", ["courseId"]),
+  }).index("by_course", ["courseId"]),
 
+  // Grades Table
   grades: defineTable({
     studentId: v.id("users"),
     assignmentId: v.id("assignments"),
@@ -59,6 +59,7 @@ const schema = defineSchema({
     .index("by_course", ["courseId"])
     .index("by_assignment", ["assignmentId"]),
 
+  // Attendance Table
   attendance: defineTable({
     studentId: v.id("users"),
     courseId: v.id("courses"),
@@ -69,19 +70,54 @@ const schema = defineSchema({
     .index("by_course", ["courseId"])
     .index("by_date", ["date"]),
 
+  // Announcements Table
   announcements: defineTable({
     title: v.string(),
     content: v.string(),
     teacherId: v.id("users"),
-    courseId: v.optional(v.id("courses")), // Optional to allow school-wide announcements
+    courseId: v.optional(v.id("courses")),
     date: v.number(),
   })
     .index("by_teacher", ["teacherId"])
     .index("by_course", ["courseId"])
     .index("by_date", ["date"]),
+
+  // 🔥 Special Education: Students Table
+  students: defineTable({
+    name: v.string(),
+    dob: v.string(),
+    grade: v.string(),
+  }).index("by_name", ["name"]),
+
+  // 🔥 Special Education: IEP Drafts Table
+  iepDrafts: defineTable({
+    studentId: v.id("students"),
+    status: v.string(), // "draft", "signed", etc.
+    plafp: v.optional(v.string()), // Present levels
+    goals: v.optional(v.array(v.string())), // Goal texts
+    services: v.optional(v.array(v.string())), // Therapy services
+    accommodations: v.optional(v.array(v.string())), // Testing accommodations
+    timestamps: v.optional(v.any()), // Important dates
+  }).index("by_student", ["studentId"]),
+
+  // 🔥 Special Education: Service Logs Table
+  serviceLogs: defineTable({
+    studentId: v.id("students"),
+    serviceType: v.string(), // e.g., "speech therapy"
+    minutesScheduled: v.number(),
+    minutesDelivered: v.number(),
+    date: v.string(), // ISO date
+  }).index("by_student_date", ["studentId", "date"]),
+
+  // 🔥 Special Education: Goals Table
+  goals: defineTable({
+    studentId: v.id("students"),
+    description: v.string(), // SMART goal text
+    createdAt: v.string(), // ISO datetime
+  }).index("by_student", ["studentId"]),
 },
 {
-  schemaValidation: false
+  schemaValidation: false,
 });
 
 export default schema;

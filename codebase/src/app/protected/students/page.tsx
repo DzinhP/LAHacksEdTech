@@ -1,137 +1,106 @@
-"use client"
+"use client";
 
-import { useState } from "react"
-import { useQuery } from "convex/react"
-import { api } from "@/convex/_generated/api"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
-import { Badge } from "@/components/ui/badge"
-import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { Loader2, GraduationCap, Search, Plus } from "lucide-react"
-import { useRouter } from "next/navigation"
-import { motion } from "framer-motion"
-import { Input } from "@/components/ui/input"
+import { useState } from "react";
+import { useParams } from "next/navigation";
+import { useQuery, useMutation, useAction } from "convex/react";
 
-export default function StudentsPage() {
-  const router = useRouter()
-  
-  // Use a query to list all students instead of getting details for a specific student
-  const students = useQuery(api.students.listStudents)
-  
-  const [searchQuery, setSearchQuery] = useState("")
-  
-  // Filter students based on search query
-  const filteredStudents = students?.filter(student => 
-    student.name?.toLowerCase().includes(searchQuery.toLowerCase()) || 
-    student.email?.toLowerCase().includes(searchQuery.toLowerCase())
-  ) || []
-  
-  // Get initials from name
-  const getInitials = (name: string | undefined) => {
-    if (!name) return "S"
-    return name
-      .split(' ')
-      .map(part => part.charAt(0))
-      .join('')
-      .toUpperCase()
-      .substring(0, 2)
+import { api } from "@/convex/_generated/api";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Loader2 } from "lucide-react";
+
+export default function IepDraftPage() {
+  const { draftId } = useParams();
+  const draft = useQuery(api.iepDrafts.getDraft, draftId ? { draftId: draftId as any } : "skip");
+  const generateIepGoal = useAction(api.ai.generateIepGoal);
+  const saveGeneratedGoal = useMutation(api.iepDrafts.saveGeneratedGoalToDraft);
+
+  const [goal, setGoal] = useState<string>("");
+  const [loading, setLoading] = useState(false);
+  const [saving, setSaving] = useState(false);
+
+  async function handleGenerateGoal() {
+    if (!draft?.plafp) {
+      alert("No PLAAFP found for this draft.");
+      return;
+    }
+
+    setLoading(true);
+    try {
+      const smartGoal = await generateIepGoal({ plafp: draft.plafp });
+      setGoal(smartGoal);
+    } catch (error) {
+      console.error("Failed to generate goal:", error);
+    } finally {
+      setLoading(false);
+    }
   }
-  
-  // Loading state
-  if (students === undefined) {
+
+  async function handleSaveGoal() {
+    if (!goal) {
+      alert("Please generate a goal first.");
+      return;
+    }
+
+    setSaving(true);
+    try {
+      await saveGeneratedGoal({ draftId: draftId as any, newGoal: goal });
+      alert("Goal saved successfully!");
+    } catch (error) {
+      console.error("Failed to save goal:", error);
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  if (draft === undefined) {
     return (
-      <div className="container flex justify-center items-center h-[calc(100vh-200px)]">
-        <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
+      <div className="flex items-center justify-center min-h-screen">
+        <Loader2 className="h-8 w-8 animate-spin" />
       </div>
-    )
+    );
   }
-  
+
+  if (!draft) {
+    return (
+      <div className="container text-center py-20">
+        <h2 className="text-xl font-bold">Draft not found</h2>
+      </div>
+    );
+  }
+
   return (
-    <div className="container">
-      <div className="flex justify-between items-center mb-6">
-        <h2 className="text-xl font-bold tracking-tight">Students</h2>
-        <Button onClick={() => router.push('/protected/students/add')}>
-          <Plus className="mr-2 h-4 w-4" />
-          Add Student
-        </Button>
-      </div>
-      
-      <div className="mb-6">
-        <div className="relative">
-          <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-          <Input
-            placeholder="Search students by name or email..."
-            className="pl-8"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-      </div>
-      
-      {students.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
-          <GraduationCap className="h-12 w-12 text-muted-foreground mb-4" />
-          <h3 className="text-lg font-medium">No students yet</h3>
-          <p className="text-muted-foreground mt-1 mb-4">
-            Add your first student to get started
-          </p>
-          <Button onClick={() => router.push('/protected/students/add')}>
-            <Plus className="mr-2 h-4 w-4" />
-            Add Student
+    <div className="container py-8">
+      <Card>
+        <CardHeader>
+          <CardTitle>IEP Draft - {draft.status.toUpperCase()}</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-6">
+          <div>
+            <h4 className="text-lg font-medium mb-2">Present Levels (PLAAFP)</h4>
+            <p className="text-muted-foreground">{draft.plafp}</p>
+          </div>
+
+          <Button onClick={handleGenerateGoal} disabled={loading}>
+            {loading ? "Generating..." : "Generate SMART Goal"}
           </Button>
-        </div>
-      ) : filteredStudents.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-64 text-center">
-          <h3 className="text-lg font-medium">No matching students</h3>
-          <p className="text-muted-foreground mt-1">
-            Try a different search term
-          </p>
-        </div>
-      ) : (
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredStudents.map((student) => (
-            <Card key={student._id} className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => router.push(`/protected/students/${student._id}`)}>
-              <CardHeader className="flex flex-row items-center gap-4">
-                <Avatar className="h-12 w-12">
-                  <AvatarFallback className="bg-primary text-primary-foreground">
-                    {getInitials(student.name)}
-                  </AvatarFallback>
-                </Avatar>
-                <div>
-                  <CardTitle className="text-lg">{student.name || "Unnamed Student"}</CardTitle>
-                  <CardDescription className="text-sm truncate max-w-[200px]">
-                    {student.email || "No email provided"}
-                  </CardDescription>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="text-sm text-muted-foreground mb-2">
-                  {student.enrolledCourses?.length || 0} courses enrolled
-                </div>
-                <div className="flex flex-wrap gap-2">
-                  {student.enrolledCourses?.slice(0, 3).map((course) => (
-                    <Badge key={course._id} variant="outline" className="text-xs">
-                      {course.name}
-                    </Badge>
-                  ))}
-                  {(student.enrolledCourses?.length || 0) > 3 && (
-                    <Badge variant="outline" className="text-xs">
-                      +{(student.enrolledCourses?.length || 0) - 3} more
-                    </Badge>
-                  )}
-                </div>
-              </CardContent>
-              <CardFooter>
-                <Button variant="outline" className="w-full" size="sm">
-                  View Profile
-                </Button>
-              </CardFooter>
-            </Card>
-          ))}
-        </div>
-      )}
+
+          {goal && (
+            <div className="mt-6 p-4 bg-muted rounded-md">
+              <h4 className="text-lg font-medium mb-2">Generated SMART Goal:</h4>
+              <p className="text-muted-foreground">{goal}</p>
+
+              <Button
+                className="mt-4"
+                onClick={handleSaveGoal}
+                disabled={saving}
+              >
+                {saving ? "Saving..." : "Save Goal to Draft"}
+              </Button>
+            </div>
+          )}
+        </CardContent>
+      </Card>
     </div>
-  )
+  );
 }
