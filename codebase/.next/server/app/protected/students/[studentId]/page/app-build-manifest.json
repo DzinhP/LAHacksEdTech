@@ -1,0 +1,27 @@
+{
+  "pages": {
+    "/protected/students/[studentId]/page": [
+      "static/chunks/node_modules__pnpm_a1616c25._.js",
+      "static/chunks/src_app_ConvexClientProvider_tsx_49fab0a0._.js",
+      "static/chunks/[root-of-the-server]__8ebb6d4b._.css",
+      "static/chunks/src_app_layout_tsx_8d80e407._.js",
+      "static/chunks/src_055185f8._.js",
+      "static/chunks/9c939_tailwind-merge_dist_bundle-mjs_mjs_5274cb0a._.js",
+      "static/chunks/40c62_framer-motion_dist_es_f0714d3c._.js",
+      "static/chunks/8593c_convex_dist_esm_server_e61bd08d._.js",
+      "static/chunks/node_modules__pnpm_312088b9._.js",
+      "static/chunks/src_app_protected_layout_tsx_4c10c377._.js",
+      "static/chunks/src_fde996f7._.js",
+      "static/chunks/node_modules__pnpm_ec588e3a._.js",
+      "static/chunks/src_app_protected_students_[studentId]_page_tsx_38607315._.js",
+      "static/chunks/[turbopack]_browser_dev_hmr-client_hmr-client_ts_664d72a4._.js",
+      "static/chunks/32a9e_next_dist_compiled_e64c8dbd._.js",
+      "static/chunks/32a9e_next_dist_client_56a827c2._.js",
+      "static/chunks/32a9e_next_dist_1143052f._.js",
+      "static/chunks/61dca_@swc_helpers_cjs_e27e0aca._.js",
+      "static/chunks/src_instrumentation-client_ts_4aba9a11._.js",
+      "static/chunks/_e69f0d32._.js",
+      "static/chunks/_477906d9._.js"
+    ]
+  }
+}
