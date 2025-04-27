@@ -3,4 +3,8 @@
 
 node_modules/
 
+<<<<<<< HEAD
 .next/
+=======
+.next/
+>>>>>>> fe63599c4c35e553bae1d751f39aea100bfd2b65

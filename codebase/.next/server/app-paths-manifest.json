@@ -1,0 +1,7 @@
+{
+  "/page": "app/page.js",
+  "/protected/courses/page": "app/protected/courses/page.js",
+  "/protected/iep/[draftId]/page": "app/protected/iep/[draftId]/page.js",
+  "/protected/page": "app/protected/page.js",
+  "/protected/students/page": "app/protected/students/page.js"
+}
