@@ -18,11 +18,9 @@ export default function ProtectedLayout({
   const protectedMenuItems: MenuItem[] = [
     { label: "Dashboard", href: "/protected/", section: "Main" },
     { label: "Courses", href: "/protected/courses", section: "Main" },
-    { label: "Students", href: "/protected/students", section: "Main" },
     { label: "Announcements", href: "/protected/announcements", section: "Main" },
     { label: "Home Page", href: "/", section: "Navigation" },
-    { label: "Learn More", href: "https://vly.ai", section: "crack.diy" },
-    { label: 'Discord', href: 'https://discord.gg/2gSmB9DxJW', section: 'crack.diy' }
+    { label: "Learn More", href: "https://vly.ai", section: "Lift Ed" },
   ];
 
   const { isLoading, isAuthenticated, user } = useAuth();

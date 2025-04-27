@@ -29,8 +29,7 @@ const defaultMenuItems: MenuItem[] = [
   { label: 'Profile', href: '/profile', icon: 'person', section: 'Main' },
   { label: 'Settings', href: '/settings', icon: 'settings', section: 'System' },
   { label: 'Messages', href: '/messages', icon: 'mail', section: 'System' },
-  { label: 'Help', href: '/help', icon: 'help_circle', section: 'Support' },
-  { label: 'Discord', href: 'https://discord.gg/2gSmB9DxJW', section: 'Support' }
+  { label: 'Help', href: '/help', icon: 'help_circle', section: 'Support' }
 ];
 
 const Sidebar: React.FC<SidebarProps> = ({ 
