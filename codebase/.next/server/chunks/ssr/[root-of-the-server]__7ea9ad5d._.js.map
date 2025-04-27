@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 31, "column": 0}, "map": {"version":3,"sources":["file:///Users/iandu/Desktop/LAHacks%202025/LAHacksEdTech/codebase/src/app/ConvexClientProvider.tsx"],"sourcesContent":["\"use client\";\n\nimport { ConvexAuthProvider } from \"@convex-dev/auth/react\";\nimport { ConvexReactClient } from \"convex/react\";\nimport { ReactNode } from \"react\";\n\nconst convex = new ConvexReactClient(process.env.NEXT_PUBLIC_CONVEX_URL!);\n\nexport function ConvexClientProvider({ children }: { children: ReactNode }) {\n  return <ConvexAuthProvider client={convex}>{children}</ConvexAuthProvider>;\n}\n"],"names":[],"mappings":";;;;AAEA;AACA;AAAA;AAHA;;;;AAMA,MAAM,SAAS,IAAI,yRAAA,CAAA,oBAAiB;AAE7B,SAAS,qBAAqB,EAAE,QAAQ,EAA2B;IACxE,qBAAO,6WAAC,qYAAA,CAAA,qBAAkB;QAAC,QAAQ;kBAAS;;;;;;AAC9C","debugId":null}}]
-}

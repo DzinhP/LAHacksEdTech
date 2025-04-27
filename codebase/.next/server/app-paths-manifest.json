@@ -1,7 +1,0 @@
-{
-  "/protected/announcements/page": "app/protected/announcements/page.js",
-  "/protected/courses/[courseId]/page": "app/protected/courses/[courseId]/page.js",
-  "/protected/courses/page": "app/protected/courses/page.js",
-  "/protected/page": "app/protected/page.js",
-  "/protected/students/page": "app/protected/students/page.js"
-}

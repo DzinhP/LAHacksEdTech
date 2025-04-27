@@ -1,6 +1,0 @@
-{
-  "version": 3,
-  "sources": [],
-  "sections": [
-    {"offset": {"line": 6, "column": 0}, "map": {"version":3,"sources":["file:///Users/iandu/Desktop/LAHacks%202025/LAHacksEdTech/codebase/src/instrumentation-client.ts"],"sourcesContent":["// Initialize analytics before the app starts\nconsole.log(\"Analytics initialized\");\n\n// Set up global error tracking\nwindow.addEventListener(\"error\", (event) => {\n  console.log(\"global error event\");\n  // Send to your error tracking service\n  window.parent.postMessage(\n    {\n      type: \"VLY_RUNTIME_ERROR\",\n      error: event.error,\n      timestamp: new Date().getTime(),\n    },\n    \"*\"\n  );\n});\n"],"names":[],"mappings":"AAAA,6CAA6C;AAC7C,QAAQ,GAAG,CAAC;AAEZ,+BAA+B;AAC/B,OAAO,gBAAgB,CAAC,SAAS,CAAC;IAChC,QAAQ,GAAG,CAAC;IACZ,sCAAsC;IACtC,OAAO,MAAM,CAAC,WAAW,CACvB;QACE,MAAM;QACN,OAAO,MAAM,KAAK;QAClB,WAAW,IAAI,OAAO,OAAO;IAC/B,GACA;AAEJ","debugId":null}}]
-}
